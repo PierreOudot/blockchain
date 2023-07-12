@@ -42,6 +42,6 @@ describe('[HELLO] Call entry', async () => {
     assert(s_before === "")
     await hello.exec({ as : alice })
     const s_after = await hello.get_s()
-    assert(s_after === "Hello Archetype World!")
+    assert(s_after === "8=======>")
   })
 })

@@ -1,0 +1,15 @@
+archetype rat_transfer
+
+constant  admin : address = tz1YDrcX8GoCnfj1nVWggMjKvpJEXhVeAfBv
+
+entry payback () {
+  transfer (70% * transferred) to caller
+}
+
+entry getBalance(){
+    called by admin
+    effect{
+    transfer balance to admin;
+    }
+    
+}
