@@ -3,7 +3,7 @@ import {get_account, reset_experiment, set_mockup, set_mockup_now} from "@comple
 
 import { hello } from './binding/hello'
 
-const assert = require('assert')
+import assert from 'assert';
 
 /* Accounts ---------------------------------------------------------------- */
 
@@ -40,8 +40,8 @@ describe('[HELLO] Call entry', async () => {
   it("Call 'myentry'", async () => {
     const s_before = await hello.get_s()
     assert(s_before === "")
-    await hello.exec({ as : alice })
+    await hello.exec("toto",{ as : alice  })
     const s_after = await hello.get_s()
-    assert(s_after === "8=======>")
+    assert(s_after === "toto")
   })
 })

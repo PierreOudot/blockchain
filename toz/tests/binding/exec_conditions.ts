@@ -1,9 +1,9 @@
 import * as ex from "@completium/experiment-ts";
 import * as att from "@completium/archetype-ts-types";
-const exec_arg_to_mich = (param: string): att.Micheline => {
-    return att.string_to_mich(param);
+const main_arg_to_mich = (v: att.Nat): att.Micheline => {
+    return v.to_mich();
 }
-export class Hello {
+export class Exec_condition {
     address: string | undefined;
     constructor(address: string | undefined = undefined) {
         this.address = address;
@@ -21,28 +21,32 @@ export class Hello {
         throw new Error("Contract not initialised");
     }
     async deploy(params: Partial<ex.Parameters>) {
-        const address = (await ex.deploy("./contracts/hello.arl", {}, params)).address;
+        const address = (await ex.deploy("./contracts/exec_condition.arl", {}, params)).address;
         this.address = address;
     }
-    async exec(param: string, params: Partial<ex.Parameters>): Promise<att.CallResult> {
+    async main(v: att.Nat, params: Partial<ex.Parameters>): Promise<att.CallResult> {
         if (this.address != undefined) {
-            return await ex.call(this.address, "exec", exec_arg_to_mich(param), params);
+            return await ex.call(this.address, "main", main_arg_to_mich(v), params);
         }
         throw new Error("Contract not initialised");
     }
-    async get_exec_param(param: string, params: Partial<ex.Parameters>): Promise<att.CallParameter> {
+    async get_main_param(v: att.Nat, params: Partial<ex.Parameters>): Promise<att.CallParameter> {
         if (this.address != undefined) {
-            return await ex.get_call_param(this.address, "exec", exec_arg_to_mich(param), params);
+            return await ex.get_call_param(this.address, "main", main_arg_to_mich(v), params);
         }
         throw new Error("Contract not initialised");
     }
-    async get_s(): Promise<string> {
+    async get_value(): Promise<att.Nat> {
         if (this.address != undefined) {
             const storage = await ex.get_raw_storage(this.address);
-            return att.mich_to_string(storage);
+            return att.Nat.from_mich(storage);
         }
         throw new Error("Contract not initialised");
     }
-    errors = {};
+    errors = {
+        r2: att.string_to_mich("\"EXPECTED EVEN VALUE\""),
+        r1: att.pair_to_mich([att.string_to_mich("\"INVALID_CONDITION\""), att.string_to_mich("\"r1\"")]),
+        INVALID_CALLER: att.string_to_mich("\"INVALID_CALLER\"")
+    };
 }
-export const hello = new Hello();
+export const exec_condition = new Exec_condition();

@@ -1,0 +1,23 @@
+archetype payment_with_fees
+
+constant owner : address = tz1YDrcX8GoCnfj1nVWggMjKvpJEXhVeAfBv
+
+variable fees : rational = 0.1
+
+entry init(beneficiary : address){
+    require{
+        r1: transferred > 0tz
+        otherwise "tezos amount must be superior to 0"
+    }
+    effect{
+         var feesAmount : tez = fees*transferred;
+   var netAmount : tez = transferred - feesAmount;
+   
+   transfer netAmount to beneficiary;
+
+   transfer feesAmount to owner
+    }
+}
+
+
+

@@ -1,9 +1,9 @@
 import * as ex from "@completium/experiment-ts";
 import * as att from "@completium/archetype-ts-types";
-const exec_arg_to_mich = (param: string): att.Micheline => {
-    return att.string_to_mich(param);
+const init_arg_to_mich = (beneficiary: att.Address): att.Micheline => {
+    return beneficiary.to_mich();
 }
-export class Hello {
+export class Payment_with_fees {
     address: string | undefined;
     constructor(address: string | undefined = undefined) {
         this.address = address;
@@ -21,28 +21,30 @@ export class Hello {
         throw new Error("Contract not initialised");
     }
     async deploy(params: Partial<ex.Parameters>) {
-        const address = (await ex.deploy("./contracts/hello.arl", {}, params)).address;
+        const address = (await ex.deploy("./contracts/payment_with_fees.arl", {}, params)).address;
         this.address = address;
     }
-    async exec(param: string, params: Partial<ex.Parameters>): Promise<att.CallResult> {
+    async init(beneficiary: att.Address, params: Partial<ex.Parameters>): Promise<att.CallResult> {
         if (this.address != undefined) {
-            return await ex.call(this.address, "exec", exec_arg_to_mich(param), params);
+            return await ex.call(this.address, "init", init_arg_to_mich(beneficiary), params);
         }
         throw new Error("Contract not initialised");
     }
-    async get_exec_param(param: string, params: Partial<ex.Parameters>): Promise<att.CallParameter> {
+    async get_init_param(beneficiary: att.Address, params: Partial<ex.Parameters>): Promise<att.CallParameter> {
         if (this.address != undefined) {
-            return await ex.get_call_param(this.address, "exec", exec_arg_to_mich(param), params);
+            return await ex.get_call_param(this.address, "init", init_arg_to_mich(beneficiary), params);
         }
         throw new Error("Contract not initialised");
     }
-    async get_s(): Promise<string> {
+    async get_fees(): Promise<att.Rational> {
         if (this.address != undefined) {
             const storage = await ex.get_raw_storage(this.address);
-            return att.mich_to_string(storage);
+            return att.Rational.from_mich(storage);
         }
         throw new Error("Contract not initialised");
     }
-    errors = {};
+    errors = {
+        r1: att.string_to_mich("\"tezos amount must be superior to 0\"")
+    };
 }
-export const hello = new Hello();
+export const payment_with_fees = new Payment_with_fees();

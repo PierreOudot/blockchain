@@ -1,0 +1,64 @@
+archetype poll(
+    owner : address,
+    expiration_date : date,
+    choices : list<string>,
+    voters : list<address>
+)
+
+states =
+| Open initial
+| Closed
+
+
+asset vote identified by choice{
+    choice : string;
+    quantity : nat = 0;
+}
+
+transition endPoll(){
+    from Open to Closed
+    when { expiration_date <= now }
+}
+
+
+entry set_expiration_date(expdate : date){
+    called by owner
+    require{
+        r0 : expdate > now
+        otherwise "poll is closed"
+    }
+    effect{
+        expiration_date := expdate
+    }
+}
+
+entry send_vote(choice_value : string){
+    require{
+        r1 : now < expiration_date;
+        r2 : choices.contains(choice_value)
+    }
+    effect{
+        vote.add_update(choice_value, { quantity+= 1 })
+    }
+}
+
+function results() : string{
+     var nvote : nat = 0; 
+     var nchoice : string = "toto";
+        for k in vote do
+        if vote[k].quantity > nvote
+        then begin
+            nvote := vote[k].quantity;
+            nchoice := vote[k].choice
+        end
+    done
+
+    constant result = (nchoice, nvote);
+
+    return result
+}
+
+
+
+
+

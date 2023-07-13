@@ -6,7 +6,7 @@
     "test": "./run_test.sh",
     "gen-binding": "completium-cli run binder-ts",
     "completium_init": "completium-cli init",
-    "mockup_init": "completium-cli mockup init"
+    "mockup_init": "completium-cli mockup init" 
   },
   "dependencies": {
     "@completium/archetype-ts-types": "latest",
